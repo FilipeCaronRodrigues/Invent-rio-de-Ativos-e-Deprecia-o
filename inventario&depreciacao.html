@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Inventário Técnico - Depreciação de Ativos</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+        <style>
+            :root {
+                --bs-midnight: #101620;
+                --bs-ice: #F8FAFC;
+                --bs-industrial: #08a6f6;
+                --bs-operational: #20966f;
+                --bs-warning: #fca207;
+                --bs-surface: #FFFFFF;
+                --bs-bordercolor: #c1cfe1;
+            }
+            body {
+                font-family: 'Inter', sans-serif;
+                background-color: var(--bs-ice);
+                color: var(--bs-midnight);
+                min-height: 100vh;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+            }
+            .bg-midnight { background-color: var(--bs-midnight) !important; }
+            .bg-ice { background-color: var(--bs-ice) !important; }
+            .bg-industrial { background-color: var(--bs-industrial) !important; }
+            .bg-surface { background-color: var(--bs-surface) !important; }
+            .text-midnight { color: var(--bs-midnight) !important; }
+            .text-industrial { color: var(--bs-industrial) !important; }
+            .text-operational { color: var(--bs-operational) !important; }
+            .text-warning-custom { color: var(--bs-warning) !important; }
+            .border-bordercolor { border-color: var(--bs-bordercolor) !important; }
+            .btn-industrial {
+                background-color: var(--bs-industrial);
+                color: #fff;
+            }
+            .btn-industrial:hover {
+                background-color: #0369a1;
+                color: #fff;
+            }
+            ::-webkit-scrollbar { width: 6px; height: 6px; }
+            ::-webkit-scrollbar-track { background: #F1F5F9; }
+            ::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 3px; }
+            ::-webkit-scrollbar-thumb:hover { background: #94A3B8; }
+        </style>
+    </head>
+
+    <body>
+        <header class="bg-midnight text-white shadow-sm sticky-top z-30">
+            <div class="max-w-7xl container py-3 d-flex align-items-center justify-content-between">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="bg-industrial p-2 rounded-3 text-white shadow-inner">
+                        <i class="bi bi-cpu fs-5"></i>
+                    </div>
+                    <div>
+                        <h1 class="font-bold fs-6 mb-0 tracking-tight">Inventário de Equipamentos e Depreciação de Ativos</h1>
+                        <p class="text-xs text-muted mb-0">Supervisão Técnica • Smart 4.0</p>
+                    </div>
+                </div>
+                <div class="d-flex align-items-center gap-4">
+                    <div class="d-none sm-flex align-items-center gap-2 bg-dark px-3 py-1.5 rounded-pill text-xs text-secondary border border-secondary">
+                        <span class="spinner-grow spinner-grow-sm text-operational" style="width: 8px; height: 8px;" role="status"></span>
+                        <span>Salvamento automático ativo</span>
+                    </div>
+                    <div class="d-flex align-items-center gap-2 border-start border-secondary ps-3">
+                        <div class="rounded-circle bg-industrial d-flex align-items-center justify-content-center fw-bold text-sm text-white shadow" style="width: 36px; height: 36px; font-size: 0.85rem;">
+                            ST
+                        </div>
+                        <div class="d-none md-block text-start">
+                            <span class="d-block text-xs fw-medium text-white">Supervisor</span>
+                            <span class="d-block text-muted" style="font-size: 10px;">Lab. Automação 02</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+        <main class="container py-5 flex-grow-1 w-100">
+            <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between mb-4 gap-3">
+                <div>
+                    <nav class="text-xs text-muted mb-1 d-flex align-items-center gap-1" style="font-size: 0.8rem;">
+                        <span>Início</span>
+                        <span>/</span>
+                        <span>Laboratório</span>
+                        <span>/</span>
+                        <span class="text-industrial fw-medium">Inventário e Depreciação</span>
+                    </nav>
+                    <h2 class="h4 fw-bold tracking-tight text-midnight mb-1">Levantamento de Ativos Industriais</h2>
+                    <p class="text-muted small mb-0">Monitore valores patrimoniais e índices de depreciação linear dos equipamentos.</p>
+                </div>
+                <div class="d-flex flex-wrap align-items-center gap-2">
+                    <button onclick="openExportModal()" class="btn btn-white bg-surface border border-bordercolor text-midnight text-sm fw-medium px-3 py-2 shadow-sm d-flex align-items-center gap-2">
+                        <i class="bi bi-download text-secondary"></i>
+                        <span>Exportar Relatório</span>
+                    </button>
+                    <button onclick="openModal()" class="btn btn-industrial text-sm fw-medium px-3 py-2 shadow d-flex align-items-center gap-2">
+                        <i class="bi bi-plus-circle"></i>
+                        <span>Registrar Equipamento</span>
+                    </button>
+                </div>
+            </div>
+            <div class="row g-3 mb-4">
+                <div class="col-12 col-sm-6 col-lg-3">
+                    <div class="bg-surface p-4 rounded-4 border border-bordercolor shadow-sm d-flex align-items-center justify-content-between h-100">
+                        <div>
+                            <p class="text-uppercase fw-semibold text-muted mb-1" style="font-size: 0.7rem; letter-spacing: 0.05em;">Total de Ativos</p>
+                            <h3 id="stat-total-items" class="fs-4 fw-bold text-midnight mb-1">0</h3>
+                            <span class="text-xs text-operational d-flex align-items-center gap-1" style="font-size: 0.75rem;">
+                                <i class="bi bi-trending-up"></i> Equipamentos cadastrados
+                            </span>
+                        </div>
+                        <div class="bg-info bg-opacity-10 text-industrial p-3 rounded-3">
+                            <i class="bi bi-layers fs-4"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-sm-6 col-lg-3">
+                    <div class="bg-surface p-4 rounded-4 border border-bordercolor shadow-sm d-flex align-items-center justify-content-between h-100">
+                        <div>
+                            <p class="text-uppercase fw-semibold text-muted mb-1" style="font-size: 0.7rem; letter-spacing: 0.05em;">Valor de Aquisição</p>
+                            <h3 id="stat-total-val" class="fs-4 fw-bold text-midnight mb-1">R$ 0,00</h3>
+                            <span class="text-muted d-block" style="font-size: 0.75rem;">Patrimônio histórico bruto</span>
+                        </div>
+                        <div class="bg-success bg-opacity-10 text-operational p-3 rounded-3">
+                            <i class="bi bi-currency-dollar fs-4"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-sm-6 col-lg-3">
+                    <div class="bg-surface p-4 rounded-4 border border-bordercolor shadow-sm d-flex align-items-center justify-content-between h-100">
+                        <div>
+                            <p class="text-uppercase fw-semibold text-muted mb-1" style="font-size: 0.7rem; letter-spacing: 0.05em;">Valor Atual (Líquido)</p>
+                            <h3 id="stat-current-val" class="fs-4 fw-bold text-industrial mb-1">R$ 0,00</h3>
+                            <span class="text-muted d-block" style="font-size: 0.75rem;">Após depreciação linear</span>
+                        </div>
+                        <div class="bg-warning bg-opacity-10 text-warning-custom p-3 rounded-3">
+                            <i class="bi bi-activity fs-4"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-sm-6 col-lg-3">
+                    <div class="bg-surface p-4 rounded-4 border border-bordercolor shadow-sm d-flex align-items-center justify-content-between h-100">
+                        <div>
+                            <p class="text-uppercase fw-semibold text-muted mb-1" style="font-size: 0.7rem; letter-spacing: 0.05em;">Depreciação Acumulada</p>
+                            <h3 id="stat-dep-val" class="fs-4 fw-bold text-danger mb-1">R$ 0,00</h3>
+                            <span class="text-danger d-flex align-items-center gap-1" style="font-size: 0.75rem;">
+                                <i class="bi bi-trending-down"></i> Perda estimada total
+                            </span>
+                        </div>
+                        <div class="bg-danger bg-opacity-10 text-danger p-3 rounded-3">
+                            <i class="bi bi-pie-chart fs-4"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-surface rounded-4 border border-bordercolor shadow-sm mb-4 p-3">
+                <div class="row align-items-center g-3">
+                    <div class="col-12 col-md-6">
+                        <div class="input-group">
+                            <span class="input-group-text bg-ice border-bordercolor text-muted"><i class="bi bi-search"></i></span>
+                            <input type="text" id="search-input" oninput="filterTable()" placeholder="Buscar por nome, marca ou nº de série..." class="form-control bg-ice border-bordercolor text-sm shadow-none">
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6 d-flex flex-wrap align-items-center justify-content-md-end gap-2">
+                        <select id="category-filter" onchange="filterTable()" class="form-select form-select-sm bg-ice border-bordercolor w-auto text-midnight shadow-none py-2">
+                            <option value="">Todas as Categorias</option>
+                            <option value="Bancada">Bancada Didática</option>
+                            <option value="CLP">CLP</option>
+                            <option value="Computador">Computadores</option>
+                            <option value="Inversor">Inversores de Frequência</option>
+                            <option value="Sensores">Motores</option>
+                            <option value="Sensores">Sensores & Atuadores</option>
+                        </select>
+                        <button onclick="resetFilters()" class="btn btn-link text-xs text-secondary text-decoration-underline p-0">Limpar Filtros</button>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-surface rounded-4 border border-bordercolor shadow-sm overflow-hidden mb-5">
+                <div class="px-4 py-3 border-bottom border-bordercolor d-flex align-items-center justify-content-between bg-white">
+                    <h3 class="font-semibold text-midnight fs-6 mb-0">Equipamentos Cadastrados</h3>
+                    <span id="item-count-badge" class="badge bg-light text-secondary border px-2.5 py-1 rounded-pill fw-medium" style="font-size: 0.75rem;">0 itens</span>
+                </div>
+                <div class="table-responsive">
+                    <table class="table align-middle mb-0 text-start">
+                        <thead class="bg-light text-secondary uppercase fw-semibold" style="font-size: 0.65rem; letter-spacing: 0.05em;">
+                            <tr>
+                                <th class="py-3 px-4">Equipamento / Marca</th>
+                                <th class="py-3 px-3">Categoria</th>
+                                <th class="py-3 px-3">Nº de Série</th>
+                                <th class="py-3 px-3">Aquisição</th>
+                                <th class="py-3 px-3 text-end">Valor Compra</th>
+                                <th class="py-3 px-3 text-end">Valor Atual</th>
+                                <th class="py-3 px-3 text-center">Depreciação</th>
+                                <th class="py-3 px-4 text-center">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="inventory-table-body" class="border-top-0 text-sm text-secondary">
+                        </tbody>
+                    </table>
+                </div>
+                <div id="empty-state" class="py-5 text-center">
+                    <div class="rounded-circle bg-light text-muted d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 60px; height: 60px;">
+                        <i class="bi bi-folder2-open fs-3"></i>
+                    </div>
+                    <h4 class="h6 fw-semibold text-secondary mb-1">Nenhum equipamento cadastrado</h4>
+                    <p class="text-muted small mb-0">Cadastre novos itens usando o botão "Registrar Equipamento" acima.</p>
+                </div>
+            </div>
+        </main>
+        <div class="modal fade" id="equipment-modal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content border-0 rounded-4 shadow-lg overflow-hidden">
+                    <div class="modal-header bg-midnight text-white px-4 py-3 border-0">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="bi bi-cpu text-industrial fs-5"></i>
+                            <h3 id="modal-title" class="modal-title fs-6 fw-semibold mb-0">Registrar Novo Equipamento</h3>
+                        </div>
+                        <button type="button" class="btn-close btn-close-white shadow-none" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                    </div>
+                    <form id="equipment-form" onsubmit="handleFormSubmit(event)">
+                        <div class="modal-body p-4 bg-surface">
+                            <input type="hidden" id="item-id">
+                            <div class="row g-3 mb-3">
+                                <div class="col-12 col-md-6">
+                                    <label class="form-label text-uppercase fw-semibold text-muted" style="font-size: 0.7rem;">Nome / Modelo do Ativo *</label>
+                                    <input type="text" id="item-name" required placeholder="Ex: CLP Siemens S7-1200" class="form-control bg-ice border-bordercolor text-sm shadow-none">
+                                </div>
+                                <div class="col-12 col-md-6">
+                                    <label class="form-label text-uppercase fw-semibold text-muted" style="font-size: 0.7rem;">Categoria *</label>
+                                    <select id="item-category" required class="form-select bg-ice border-bordercolor text-sm shadow-none">
+                                        <option value="">Selecione a categoria...</option>
+                                        <option value="CLP">CLP</option>
+                                        <option value="Inversor">Inversores de Frequência</option>
+                                        <option value="Computador">Computadores / Terminais</option>
+                                        <option value="Sensores">Sensores & Atuadores</option>
+                                        <option value="Bancada">Bancada Didática</option>
+                                        <option value="Outros">Outros Dispositivos</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row g-3 mb-3">
+                                <div class="col-12 col-md-6">
+                                    <label class="form-label text-uppercase fw-semibold text-muted" style="font-size: 0.7rem;">Número de Série / Patrimônio *</label>
+                                    <input type="text" id="item-serial" required placeholder="Ex: SN-998234-BR" class="form-control bg-ice border-bordercolor text-sm shadow-none">
+                                </div>
+                                <div class="col-12 col-md-6">
+                                    <label class="form-label text-uppercase fw-semibold text-muted" style="font-size: 0.7rem;">Valor de Aquisição (R$) *</label>
+                                    <input type="number" step="0.01" min="0" id="item-value" required placeholder="Ex: 12500.00" oninput="previewDepreciation()" class="form-control bg-ice border-bordercolor text-sm shadow-none">
+                                </div>
+                            </div>
+
+                            <div class="row g-3 mb-3">
+                                <div class="col-12 col-md-6">
+                                    <label class="form-label text-uppercase fw-semibold text-muted" style="font-size: 0.7rem;">Data de Aquisição *</label>
+                                    <input type="date" id="item-date" required onchange="previewDepreciation()" class="form-control bg-ice border-bordercolor text-sm shadow-none">
+                                </div>
+                                <div class="col-12 col-md-6">
+                                    <label class="form-label text-uppercase fw-semibold text-muted" style="font-size: 0.7rem;">Vida Útil Estimada (Anos) *</label>
+                                    <input type="number" min="1" max="50" id="item-lifespan" required value="10" oninput="previewDepreciation()" class="form-control bg-ice border-bordercolor text-sm shadow-none">
+                                </div>
+                            </div>
+
+                            <div class="bg-info bg-opacity-10 border border-info border-opacity-25 rounded-3 p-3">
+                                <h4 class="text-uppercase fw-bold text-industrial mb-2 d-flex align-items-center gap-1" style="font-size: 0.7rem; letter-spacing: 0.05em;">
+                                    <i class="bi bi-calculator"></i> Prévia de Depreciação (Linear)
+                                </h4>
+                                <div class="row g-2 text-center">
+                                    <div class="col-4">
+                                        <div class="bg-white p-2 rounded-2 border border-info border-opacity-10 shadow-sm">
+                                            <span class="d-block text-uppercase text-muted fw-semibold" style="font-size: 9px;">Idade Ativo</span>
+                                            <span id="preview-age" class="small fw-bold text-midnight">0 anos</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-4">
+                                        <div class="bg-white p-2 rounded-2 border border-info border-opacity-10 shadow-sm">
+                                            <span class="d-block text-uppercase text-muted fw-semibold" style="font-size: 9px;">Valor Atual</span>
+                                            <span id="preview-current-val" class="small fw-bold text-industrial">R$ 0,00</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-4">
+                                        <div class="bg-white p-2 rounded-2 border border-info border-opacity-10 shadow-sm">
+                                            <span class="d-block text-uppercase text-muted fw-semibold" style="font-size: 9px;">Desvalorização</span>
+                                            <span id="preview-dep-pct" class="small fw-bold text-danger">0%</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="modal-footer bg-light px-4 py-3 border-top border-bordercolor">
+                            <button type="button" class="btn btn-outline-secondary btn-sm px-3" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-industrial btn-sm px-4 d-flex align-items-center gap-1 shadow-sm">
+                                <i class="bi bi-check"></i>
+                                <span id="modal-submit-text">Salvar e Adicionar ao Inventário</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="export-modal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-0 rounded-4 shadow-lg overflow-hidden">
+                    <div class="modal-header bg-midnight text-white px-4 py-3 border-0">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="bi bi-download text-industrial fs-5"></i>
+                            <h3 class="modal-title fs-6 fw-semibold mb-0">Exportar Dados do Laboratório</h3>
+                        </div>
+                        <button type="button" class="btn-close btn-close-white shadow-none" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                    </div>
+                    <div class="modal-body p-4 bg-surface">
+                        <p class="text-sm text-secondary mb-3">Escolha o formato de saída para o relatório de inventário e depreciação técnica:</p>
+                        <div class="row g-3">
+                            <div class="col-6">
+                                <button onclick="simulateExport('PDF')" class="btn w-100 border border-bordercolor hover-border-industrial bg-surface rounded-4 p-3 d-flex flex-column align-items-center justify-content-center text-center shadow-none group">
+                                    <div class="rounded-circle bg-danger bg-opacity-10 text-danger d-flex align-items-center justify-content-center mb-2" style="width: 40px; height: 40px;">
+                                        <i class="bi bi-file-earmark-text fs-5"></i>
+                                    </div>
+                                    <span class="fw-semibold text-sm text-midnight">Relatório PDF</span>
+                                    <span class="text-muted" style="font-size: 10px;">Laudo Técnico Executivo</span>
+                                </button>
+                            </div>
+                            <div class="col-6">
+                                <button onclick="simulateExport('CSV')" class="btn w-100 border border-bordercolor hover-border-industrial bg-surface rounded-4 p-3 d-flex flex-column align-items-center justify-content-center text-center shadow-none group">
+                                    <div class="rounded-circle bg-success bg-opacity-10 text-success d-flex align-items-center justify-content-center mb-2" style="width: 40px; height: 40px;">
+                                        <i class="bi bi-table fs-5"></i>
+                                    </div>
+                                    <span class="fw-semibold text-sm text-midnight">Planilha CSV</span>
+                                    <span class="text-muted" style="font-size: 10px;">Dados brutos para Excel</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer bg-light px-4 py-3 border-top border-bordercolor">
+                        <button type="button" class="btn btn-outline-secondary btn-sm px-3" data-bs-dismiss="modal">Fechar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="toast-container position-fixed bottom-0 end-0 p-3 z-50">
+            <div id="toast-notification" class="toast align-items-center text-white bg-midnight border-secondary shadow-lg" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="d-flex">
+                    <div class="toast-body d-flex align-items-center gap-2">
+                        <i id="toast-icon" class="bi bi-check-circle-fill text-operational fs-5"></i>
+                        <div>
+                            <h6 id="toast-title" class="fw-semibold mb-0 text-xs">Sucesso</h6>
+                            <p id="toast-message" class="text-secondary mb-0" style="font-size: 11px;">Operação realizada com sucesso.</p>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto shadow-none" data-bs-dismiss="toast" aria-label="Fechar"></button>
+                </div>
+            </div>
+        </div>
+        <footer class="bg-white border-top border-bordercolor py-4 text-center text-xs text-secondary mt-auto">
+            <div class="container d-flex flex-column flex-sm-row align-items-center justify-content-between gap-2">
+                <p class="mb-0">Sistema de Gestão de Ativos e Depreciação</p>
+                <div class="d-flex align-items-center gap-3">
+                    <span class="text-decoration-none text-secondary" style="cursor: pointer;">Documentação Técnica</span>
+                    <span>•</span>
+                    <span class="text-decoration-none text-secondary" style="cursor: pointer;">Suporte TI</span>
+                </div>
+            </div>
+        </footer>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+        <script>
+            // Banco de dados zerado para que o usuário faça todos os cadastros
+            let equipmentList = [];
+            let equipmentModal = null;
+            let exportModal = null;
+            let toastInstance = null;
+
+            window.addEventListener('DOMContentLoaded', () => {
+                equipmentModal = new bootstrap.Modal(document.getElementById('equipment-modal'));
+                exportModal = new bootstrap.Modal(document.getElementById('export-modal'));
+                toastInstance = new bootstrap.Toast(document.getElementById('toast-notification'));
+                
+                renderTable();
+                updateDashboardMetrics();
+            });
+
+            // Função para abrir o modal de cadastro limpo
+            function openModal() {
+                document.getElementById('equipment-form').reset();
+                document.getElementById('item-id').value = '';
+                document.getElementById('modal-title').textContent = 'Registrar Novo Equipamento';
+                document.getElementById('modal-submit-text').textContent = 'Salvar e Adicionar ao Inventário';
+                // Definir data padrão de hoje
+                const today = new Date().toISOString().split('T')[0];
+                document.getElementById('item-date').value = today;
+                previewDepreciation();
+                equipmentModal.show();
+            }
+
+            function closeModal() {
+                equipmentModal.hide();
+            }
+
+            function openExportModal() {
+                exportModal.show();
+            }
+
+            function closeExportModal() {
+                exportModal.hide();
+            }
+
+            // Calcular Depreciação Linear
+            function calculateDepreciation(item) {
+                const acquisitionDate = new Date(item.date);
+                const currentDate = new Date();
+                const diffTime = Math.abs(currentDate - acquisitionDate);
+                const diffDays = diffTime / (1000 * 60 * 60 * 24);
+                const ageYears = diffDays / 365.25;
+                const lifespan = parseFloat(item.lifespan) || 10;
+                const purchaseValue = parseFloat(item.value) || 0;
+                const annualDepreciation = purchaseValue / lifespan;
+                let accumulatedDepreciation = annualDepreciation * ageYears;
+                
+                if (accumulatedDepreciation > purchaseValue) accumulatedDepreciation = purchaseValue;
+                if (accumulatedDepreciation < 0) accumulatedDepreciation = 0;
+
+                let currentValue = purchaseValue - accumulatedDepreciation;
+                if (currentValue < 0) currentValue = 0;
+
+                const depreciationPercentage = purchaseValue > 0 ? (accumulatedDepreciation / purchaseValue) * 100 : 0;
+
+                return {
+                    ageYears: Math.max(0, ageYears).toFixed(1),
+                    currentValue: currentValue,
+                    accumulatedDepreciation: accumulatedDepreciation,
+                    depreciationPercentage: Math.min(100, Math.max(0, depreciationPercentage))
+                };
+            }
+
+            function previewDepreciation() {
+                const val = parseFloat(document.getElementById('item-value').value) || 0;
+                const dateStr = document.getElementById('item-date').value;
+                const lifespan = parseFloat(document.getElementById('item-lifespan').value) || 10;
+
+                if (!dateStr) return;
+
+                const dummyItem = { value: val, date: dateStr, lifespan: lifespan };
+                const dep = calculateDepreciation(dummyItem);
+
+                document.getElementById('preview-age').textContent = `${dep.ageYears} anos`;
+                document.getElementById('preview-current-val').textContent = formatCurrency(dep.currentValue);
+                document.getElementById('preview-dep-pct').textContent = `${dep.depreciationPercentage.toFixed(1)}%`;
+            }
+
+            function formatCurrency(val) {
+                return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(val);
+            }
+
+            function formatDate(dateStr) {
+                if (!dateStr) return '';
+                const parts = dateStr.split('-');
+                if (parts.length !== 3) return dateStr;
+                return `${parts[2]}/${parts[1]}/${parts[0]}`;
+            }
+
+            function updateDashboardMetrics() {
+                let totalItems = equipmentList.length;
+                let totalValuation = 0;
+                let totalCurrentValuation = 0;
+                let totalDepreciation = 0;
+
+                equipmentList.forEach(item => {
+                    const dep = calculateDepreciation(item);
+                    totalValuation += parseFloat(item.value);
+                    totalCurrentValuation += dep.currentValue;
+                    totalDepreciation += dep.accumulatedDepreciation;
+                });
+
+                document.getElementById('stat-total-items').textContent = totalItems;
+                document.getElementById('stat-total-val').textContent = formatCurrency(totalValuation);
+                document.getElementById('stat-current-val').textContent = formatCurrency(totalCurrentValuation);
+                document.getElementById('stat-dep-val').textContent = formatCurrency(totalDepreciation);
+                document.getElementById('item-count-badge').textContent = `${totalItems} itens`;
+            }
+
+            function renderTable(filteredData = null) {
+                const tbody = document.getElementById('inventory-table-body');
+                const emptyState = document.getElementById('empty-state');
+                tbody.innerHTML = '';
+                const dataToRender = filteredData || equipmentList;
+
+                if (dataToRender.length === 0) {
+                    emptyState.classList.remove('d-none');
+                    return;
+                } else {
+                    emptyState.classList.add('d-none');
+                }
+
+                dataToRender.forEach(item => {
+                    const dep = calculateDepreciation(item);
+                    
+                    let catColorbg = 'bg-secondary bg-opacity-10 text-secondary';
+                    if (item.category === 'CLP') catColorbg = 'bg-info bg-opacity-10 text-info';
+                    else if (item.category === 'Inversor') catColorbg = 'bg-warning bg-opacity-10 text-warning-custom';
+                    else if (item.category === 'Computador') catColorbg = 'bg-primary bg-opacity-10 text-primary';
+                    else if (item.category === 'Bancada') catColorbg = 'bg-success bg-opacity-10 text-success';
+
+                    let barColor = 'bg-industrial';
+                    if (dep.depreciationPercentage > 75) barColor = 'bg-danger';
+                    else if (dep.depreciationPercentage > 40) barColor = 'bg-warning';
+
+                    const tr = document.createElement('tr');
+                    tr.className = 'border-bottom border-bordercolor';
+                    tr.innerHTML = `
+                        <td class="py-3 px-4">
+                            <span class="fw-semibold d-block text-midnight">${item.name}</span>
+                            <span class="text-muted" style="font-size: 11px;">Vida útil: ${item.lifespan} anos</span>
+                        </td>
+                        <td class="py-3 px-3">
+                            <span class="badge ${catColorbg} fw-medium">${item.category}</span>
+                        </td>
+                        <td class="py-3 px-3 font-monospace text-xs text-secondary">${item.serial}</td>
+                        <td class="py-3 px-3 text-xs text-secondary">${formatDate(item.date)}</td>
+                        <td class="py-3 px-3 text-end fw-medium text-midnight">${formatCurrency(item.value)}</td>
+                        <td class="py-3 px-3 text-end fw-bold text-industrial">${formatCurrency(dep.currentValue)}</td>
+                        <td class="py-3 px-3" style="width: 140px;">
+                            <div class="d-flex align-items-center justify-content-between mb-1" style="font-size: 10px;">
+                                <span class="text-muted">${dep.depreciationPercentage.toFixed(0)}%</span>
+                                <span class="text-danger">${formatCurrency(dep.accumulatedDepreciation)}</span>
+                            </div>
+                            <div class="progress" style="height: 6px;">
+                                <div class="progress-bar ${barColor}" role="progressbar" style="width: ${dep.depreciationPercentage}%" aria-valuenow="${dep.depreciationPercentage}" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                        </td>
+                        <td class="py-3 px-4 text-center">
+                            <div class="d-flex align-items-center justify-content-center gap-1">
+                                <button onclick="editEquipment('${item.id}')" class="btn btn-sm btn-outline-secondary border-0 p-1" title="Editar">
+                                    <i class="bi bi-pencil-square text-secondary"></i>
+                                </button>
+                                <button onclick="deleteEquipment('${item.id}')" class="btn btn-sm btn-outline-danger border-0 p-1" title="Excluir">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
+
+            function handleFormSubmit(event) {
+                event.preventDefault();
+
+                const idField = document.getElementById('item-id').value;
+                const name = document.getElementById('item-name').value;
+                const category = document.getElementById('item-category').value;
+                const serial = document.getElementById('item-serial').value;
+                const value = parseFloat(document.getElementById('item-value').value);
+                const date = document.getElementById('item-date').value;
+                const lifespan = parseInt(document.getElementById('item-lifespan').value);
+
+                if (idField) {
+                    // Editar item existente
+                    const index = equipmentList.findIndex(i => i.id === idField);
+                    if (index !== -1) {
+                        equipmentList[index] = { id: idField, name, category, serial, value, date, lifespan };
+                        showToast('Atualizado!', 'Equipamento atualizado com sucesso no inventário.');
+                    }
+                } else {
+                    // Criar novo item
+                    const newItem = {
+                        id: Date.now().toString(),
+                        name,
+                        category,
+                        serial,
+                        value,
+                        date,
+                        lifespan
+                    };
+                    equipmentList.push(newItem);
+                    showToast('Registrado!', 'Novo equipamento adicionado ao laboratório.');
+                }
+
+                closeModal();
+                renderTable();
+                updateDashboardMetrics();
+            }
+
+            function editEquipment(id) {
+                const item = equipmentList.find(i => i.id === id);
+                if (!item) return;
+
+                document.getElementById('item-id').value = item.id;
+                document.getElementById('item-name').value = item.name;
+                document.getElementById('item-category').value = item.category;
+                document.getElementById('item-serial').value = item.serial;
+                document.getElementById('item-value').value = item.value;
+                document.getElementById('item-date').value = item.date;
+                document.getElementById('item-lifespan').value = item.lifespan;
+
+                document.getElementById('modal-title').textContent = 'Editar Equipamento';
+                document.getElementById('modal-submit-text').textContent = 'Salvar Alterações';
+
+                previewDepreciation();
+                equipmentModal.show();
+            }
+
+            function deleteEquipment(id) {
+                if (confirm('Tem certeza que deseja remover este equipamento do inventário?')) {
+                    equipmentList = equipmentList.filter(i => i.id !== id);
+                    renderTable();
+                    updateDashboardMetrics();
+                    showToast('Removido', 'O equipamento foi excluído com sucesso.', 'text-danger');
+                }
+            }
+
+            function filterTable() {
+                const query = document.getElementById('search-input').value.toLowerCase();
+                const selectedCategory = document.getElementById('category-filter').value;
+
+                const filtered = equipmentList.filter(item => {
+                    const matchesSearch = item.name.toLowerCase().includes(query) || 
+                                          item.serial.toLowerCase().includes(query) || 
+                                          item.category.toLowerCase().includes(query);
+                    const matchesCategory = selectedCategory === '' || item.category === selectedCategory;
+
+                    return matchesSearch && matchesCategory;
+                });
+
+                renderTable(filtered);
+            }
+
+            function resetFilters() {
+                document.getElementById('search-input').value = '';
+                document.getElementById('category-filter').value = '';
+                renderTable();
+            }
+
+            function simulateExport(format) {
+                closeExportModal();
+                showToast('Exportação Concluída', `O relatório em formato ${format} foi gerado com sucesso.`);
+            }
+
+            function showToast(title, message, iconColorClass = 'text-operational') {
+                document.getElementById('toast-title').textContent = title;
+                document.getElementById('toast-message').textContent = message;
+                document.getElementById('toast-icon').className = `bi bi-check-circle-fill ${iconColorClass} fs-5`;
+                toastInstance.show();
+            }
+        </script>
+    </body>
+
+</html>
